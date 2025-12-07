@@ -1,0 +1,79 @@
+# Sample Commands for OS Chat Project
+
+## ===== Building the Project =====
+
+cd ~/projects/os_chat_project
+mkdir build && cd build
+cmake ..
+make -j4
+
+## ===== Socket Mode - Three Terminals =====
+
+# Terminal 1: Start the server
+./server/chat_server --port 5000
+
+# Terminal 2: Start first client (alice)
+./client_gui/chat_client --mode socket --ip 127.0.0.1 --port 5000 --user alice
+
+# Terminal 3: Start second client (bob)
+./client_gui/chat_client --mode socket --ip 127.0.0.1 --port 5000 --user bob
+
+# Now both clients can exchange messages through the server
+
+## ===== Shared Memory Mode - Two Terminals =====
+
+# First, cleanup any old shared memory
+./scripts/cleanup_shm.sh
+
+# Terminal 1: Start first client (alice)
+./client_gui/chat_client --mode shm --shmname /os_chat_shm --user alice
+
+# Terminal 2: Start second client (bob)
+./client_gui/chat_client --mode shm --shmname /os_chat_shm --user bob
+
+# Both clients communicate via shared memory ring buffer
+
+## ===== Running Tests =====
+
+cd build
+
+# Test socket system
+./tests/test_socket
+
+# Test shared memory system
+./tests/test_shm
+
+# Run all tests
+ctest
+
+## ===== Network Testing (Different Machines) =====
+
+# On Server Machine (192.168.1.100):
+./server/chat_server --port 5000
+
+# On Client Machine (192.168.1.50):
+./client_gui/chat_client --mode socket --ip 192.168.1.100 --port 5000 --user remote_user
+
+## ===== Message Examples =====
+
+Client 1 (alice): "Hello, this is a test message"
+Client 2 (bob): "Hi alice! How are you?"
+Client 1 (alice): "I'm good, just testing the socket chat system"
+
+# In Shared Memory Mode:
+Client 1 (alice): "This uses POSIX shared memory instead of network sockets"
+Client 2 (bob): "Same machine, much lower latency!"
+
+## ===== Troubleshooting =====
+
+# If "Address already in use"
+pkill -f chat_server
+
+# If shared memory permission issues
+sudo ./scripts/cleanup_shm.sh
+
+# If Qt5 not found
+sudo apt-get install qtbase5-dev
+
+# If compilation fails
+rm -rf build && mkdir build && cd build && cmake .. && make
