@@ -38,7 +38,7 @@ void signal_handler(int sig) {
     }
 }
 
-void broadcast_message(const Message& msg, int exclude_client_id = -1) {
+void broadcast_message(const Message& msg, int exclude_client_id) {
     std::lock_guard<std::mutex> lock(clients_mutex);
     
     for (auto& client : clients) {

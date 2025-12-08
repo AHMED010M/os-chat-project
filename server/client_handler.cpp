@@ -68,7 +68,8 @@ bool ClientHandler::receive_username() {
 void ClientHandler::message_loop() {
     Message msg;
     while (!should_stop_ && ChatUtils::recv_message(socket_fd_, msg)) {
-        // Message received; timestamp will be overwritten by server
-        // (This is where the server broadcasts to other clients)
+        strncpy(msg.timestamp, Message::get_current_timestamp().c_str(), MAX_TIMESTAMP_LEN - 1);
+        broadcast_message(msg, client_id_);
     }
+}
 }

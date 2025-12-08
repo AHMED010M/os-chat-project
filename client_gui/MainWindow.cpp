@@ -100,7 +100,7 @@ void MainWindow::setup_ui() {
     // ===== Chat Area =====
     messages_display_ = new QTextEdit();
     messages_display_->setReadOnly(true);
-    messages_display_->setStyleSheet("QTextEdit { background-color: #f5f5f5; }");
+    messages_display_->setStyleSheet("QTextEdit { background-color: #1e1e1e; color: #e0e0e0; font-family: monospace; font-size: 11pt}");
     main_layout->addWidget(new QLabel("Messages:"));
     main_layout->addWidget(messages_display_);
 
