@@ -10,6 +10,9 @@
 
 using namespace ChatUtils;
 
+// Forward declaration (defined in server.cpp)
+extern void broadcast_message(const Message& msg, int exclude_client_id);
+
 ClientHandler::ClientHandler(int socket_fd, int client_id)
     : socket_fd_(socket_fd), client_id_(client_id), 
       connected_(false), should_stop_(false) {}
@@ -68,7 +71,10 @@ bool ClientHandler::receive_username() {
 void ClientHandler::message_loop() {
     Message msg;
     while (!should_stop_ && ChatUtils::recv_message(socket_fd_, msg)) {
-        // Message received; timestamp will be overwritten by server
-        // (This is where the server broadcasts to other clients)
+        // Update timestamp
+        strncpy(msg.timestamp, Message::get_current_timestamp().c_str(), MAX_TIMESTAMP_LEN - 1);
+        
+        // Broadcast to all clients except sender
+        broadcast_message(msg, client_id_);
     }
 }
