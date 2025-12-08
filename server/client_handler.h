@@ -16,6 +16,9 @@
 #include <atomic>
 #include "../shared/protocol.h"
 
+// Forward declaration for broadcast
+void broadcast_message(const Message& msg, int exclude_client_id = -1);
+
 class ClientHandler {
 public:
     ClientHandler(int socket_fd, int client_id);
