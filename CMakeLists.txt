@@ -26,7 +26,6 @@ add_subdirectory(server)
 add_subdirectory(client_gui)
 add_subdirectory(tests)
 
-echo_msg="OS Chat Project - Multi-threaded System (Socket + Shared Memory)"
-message(STATUS "${echo_msg}")
+message(STATUS "OS Chat Project - Multi-threaded System (Socket + Shared Memory)")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
