@@ -55,7 +55,7 @@ bool SocketClient::connect_to_server(const QString& host, int port, const QStrin
     strncpy(msg.timestamp, Message::get_current_timestamp().c_str(), MAX_TIMESTAMP_LEN - 1);
     strncpy(msg.text, "[JOINED]", MAX_MESSAGE_LEN - 1);
 
-    if (!send_message_socket(socket_fd_, msg)) {
+    if (!ChatUtils::send_message(socket_fd_, msg)) {
         emit error_occurred("Failed to send username");
         close(socket_fd_);
         socket_fd_ = -1;
