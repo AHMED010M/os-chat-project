@@ -77,12 +77,15 @@ void SocketClient::disconnect() {
     connected_ = false;
 
     if (socket_fd_ >= 0) {
+        // Shutdown both send and receive to unblock any blocking recv() calls
+        shutdown(socket_fd_, SHUT_RDWR);
         close(socket_fd_);
         socket_fd_ = -1;
     }
 
+    // Detach the thread instead of joining to avoid blocking the GUI thread
     if (receive_thread_.joinable()) {
-        receive_thread_.join();
+        receive_thread_.detach();
     }
 
     emit disconnected();
