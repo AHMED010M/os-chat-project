@@ -152,8 +152,14 @@ bool ShmClient::write_to_buffer(const Message& msg) {
 bool ShmClient::read_from_buffer(Message& msg) {
     if (!layout_) return false;
 
-    // Wait for a message
-    sem_wait(count_sem_);
+    // Wait for a message with timeout
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += 1;  // 1 second timeout
+
+    if (sem_timedwait(count_sem_, &ts) != 0) {
+        return false;  // timeout or error
+    }
 
     sem_wait(mutex_sem_);
 
