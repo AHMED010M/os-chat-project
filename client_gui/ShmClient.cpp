@@ -173,8 +173,10 @@ bool ShmClient::read_from_buffer(Message& msg) {
         return false;  // timeout or error
     }
 
-    sem_wait(mutex_sem_);
-
+ if (sem_timedwait(mutex_sem_, &ts) != 0) {
+        LOG_ERROR("ShmClient", "Timeout acquiring mutex in read_from_buffer");
+        return false;
+    }
     int idx = layout_->header.read_index % layout_->header.capacity;
     msg = layout_->messages[idx];
     layout_->header.read_index++;
