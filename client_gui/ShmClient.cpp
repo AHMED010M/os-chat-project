@@ -120,8 +120,14 @@ bool ShmClient::initialize_shared_memory(const QString& shm_name) {
     }
 
     // Initialize header on first use
-    sem_wait(mutex_sem_);
-    if (layout_->header.capacity == 0) {
+ // Acquire mutex with timeout to prevent indefinite blocking
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += 1; // 1 second timeout
+    if (sem_timedwait(mutex_sem_, &ts) != 0) {
+        LOG_ERROR("ShmClient", "Timeout acquiring mutex in initialization");
+        return false;
+    }    if (layout_->header.capacity == 0) {
         layout_->header.read_index = 0;
         layout_->header.write_index = 0;
         layout_->header.count = 0;
@@ -136,8 +142,14 @@ bool ShmClient::initialize_shared_memory(const QString& shm_name) {
 bool ShmClient::write_to_buffer(const Message& msg) {
     if (!layout_) return false;
 
-    sem_wait(mutex_sem_);
-
+ // Acquire mutex with timeout
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += 1;
+    if (sem_timedwait(mutex_sem_, &ts) != 0) {
+        LOG_ERROR("ShmClient", "Timeout acquiring mutex in write_to_buffer");
+        return false;
+    }
     // Write to buffer (circular)
     int idx = layout_->header.write_index % layout_->header.capacity;
     layout_->messages[idx] = msg;
